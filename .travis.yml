@@ -14,6 +14,11 @@ env:
     # We need to manually set JAVA_HOME to Java 8 too.
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
 
+matrix:
+  allow_failures:
+  - python: 2.6
+  - python: 3.3
+
 jobs:
   fast_finish: true
   include:
