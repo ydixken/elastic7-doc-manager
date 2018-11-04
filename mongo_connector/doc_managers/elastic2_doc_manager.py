@@ -44,6 +44,8 @@ from elasticsearch import (
 )
 from elasticsearch.helpers import bulk, scan, streaming_bulk, BulkIndexError
 
+import importlib_metadata
+
 from mongo_connector import errors
 from mongo_connector.constants import DEFAULT_COMMIT_INTERVAL, DEFAULT_MAX_BULK
 from mongo_connector.util import exception_wrapper, retry_until_ok
@@ -74,7 +76,7 @@ DEFAULT_SEND_INTERVAL = 5
 
 DEFAULT_AWS_REGION = "us-east-1"
 
-__version__ = "0.4.0"
+__version__ = importlib_metadata.version("elastic2-doc-manager")
 
 
 def convert_aws_args(aws_args):
