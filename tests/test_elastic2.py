@@ -27,9 +27,7 @@ sys.path[0:0] = [""]
 
 from mongo_connector.connector import Connector
 from mongo_connector.doc_managers.elastic2_doc_manager import DocManager
-from mongo_connector.test_utils import (ReplicaSet,
-                                        assert_soon,
-                                        close_client)
+from mongo_connector.test_utils import ReplicaSet, assert_soon, close_client
 
 from mongo_connector.util import retry_until_ok
 from tests import unittest, elastic_pair, elastic_nodes
@@ -44,42 +42,38 @@ class ElasticsearchTestCase(unittest.TestCase):
 
     def setUp(self):
         # Create target index in elasticsearch
-        self.elastic_conn.indices.create(index='test', ignore=400)
-        self.elastic_conn.cluster.health(wait_for_status='yellow',
-                                         index='test')
+        self.elastic_conn.indices.create(index="test", ignore=400)
+        self.elastic_conn.cluster.health(wait_for_status="yellow", index="test")
         self.elastic_doc = DocManager(elastic_pair, auto_commit_interval=0)
 
     def tearDown(self):
-        self.elastic_conn.indices.delete(index='test', ignore=404)
+        self.elastic_conn.indices.delete(index="test", ignore=404)
         self.elastic_doc.stop()
 
     def _search(self, query=None):
         query = query or {"match_all": {}}
         return self.elastic_doc._stream_search(
-            index="test", doc_type='test',
-            body={"query": query}
+            index="test", doc_type="test", body={"query": query}
         )
 
     def _count(self):
-        return self.elastic_conn.count(index='test')['count']
+        return self.elastic_conn.count(index="test")["count"]
 
     def _remove(self):
         bulk_deletes = []
-        for result in scan(self.elastic_conn,
-                           index="test",
-                           doc_type="test"):
-            result['_op_type'] = 'delete'
+        for result in scan(self.elastic_conn, index="test", doc_type="test"):
+            result["_op_type"] = "delete"
             bulk_deletes.append(result)
         bulk(self.elastic_conn, bulk_deletes)
 
-    def _mappings(self, index='_all'):
+    def _mappings(self, index="_all"):
         mappings = self.elastic_conn.indices.get_mapping(index=index)
         if index in mappings:
-            return list(mappings[index]['mappings'].keys())
+            return list(mappings[index]["mappings"].keys())
         return []
 
     def _indices(self):
-        return list(self.elastic_conn.indices.stats()['indices'].keys())
+        return list(self.elastic_conn.indices.stats()["indices"].keys())
 
 
 class TestElastic(ElasticsearchTestCase):
@@ -112,9 +106,9 @@ class TestElastic(ElasticsearchTestCase):
             pass
         self.connector = Connector(
             mongo_address=self.repl_set.uri,
-            ns_set=['test.test'],
+            ns_set=["test.test"],
             doc_managers=(self.elastic_doc,),
-            gridfs_set=['test.test']
+            gridfs_set=["test.test"],
         )
 
         self.conn.test.test.drop()
@@ -127,42 +121,42 @@ class TestElastic(ElasticsearchTestCase):
 
     def test_insert(self):
         """Test insert operations."""
-        self.conn['test']['test'].insert_one({'name': 'paulie'})
+        self.conn["test"]["test"].insert_one({"name": "paulie"})
         assert_soon(lambda: self._count() > 0)
         result_set_1 = list(self._search())
         self.assertEqual(len(result_set_1), 1)
-        result_set_2 = self.conn['test']['test'].find_one()
+        result_set_2 = self.conn["test"]["test"].find_one()
         for item in result_set_1:
-            self.assertEqual(item['_id'], str(result_set_2['_id']))
-            self.assertEqual(item['name'], result_set_2['name'])
+            self.assertEqual(item["_id"], str(result_set_2["_id"]))
+            self.assertEqual(item["name"], result_set_2["name"])
 
     def test_remove(self):
         """Tests remove operations."""
-        self.conn['test']['test'].insert_one({'name': 'paulie'})
+        self.conn["test"]["test"].insert_one({"name": "paulie"})
         assert_soon(lambda: self._count() == 1)
-        self.conn['test']['test'].delete_one({'name': 'paulie'})
+        self.conn["test"]["test"].delete_one({"name": "paulie"})
         assert_soon(lambda: self._count() != 1)
         self.assertEqual(self._count(), 0)
 
     def test_insert_file(self):
         """Tests inserting a gridfs file
         """
-        fs = GridFS(self.conn['test'], 'test')
+        fs = GridFS(self.conn["test"], "test")
         test_data = b"test_insert_file test file"
-        id = fs.put(test_data, filename="test.txt", encoding='utf8')
+        id = fs.put(test_data, filename="test.txt", encoding="utf8")
         assert_soon(lambda: self._count() > 0)
 
         query = {"match": {"_all": "test_insert_file"}}
         res = list(self._search(query))
         self.assertEqual(len(res), 1)
         doc = res[0]
-        self.assertEqual(doc['filename'], 'test.txt')
-        self.assertEqual(doc['_id'], str(id))
-        self.assertEqual(base64.b64decode(doc['content']), test_data)
+        self.assertEqual(doc["filename"], "test.txt")
+        self.assertEqual(doc["_id"], str(id))
+        self.assertEqual(base64.b64decode(doc["content"]), test_data)
 
     def test_remove_file(self):
-        fs = GridFS(self.conn['test'], 'test')
-        id = fs.put("test file", filename="test.txt", encoding='utf8')
+        fs = GridFS(self.conn["test"], "test")
+        id = fs.put("test file", filename="test.txt", encoding="utf8")
         assert_soon(lambda: self._count() == 1)
         fs.delete(id)
         assert_soon(lambda: self._count() == 0)
@@ -175,12 +169,17 @@ class TestElastic(ElasticsearchTestCase):
 
         def check_update(update_spec):
             updated = self.conn.test.command(
-                SON([('findAndModify', 'test'),
-                     ('query', {"a": 0}),
-                     ('update', update_spec),
-                     ('new', True)]))['value']
+                SON(
+                    [
+                        ("findAndModify", "test"),
+                        ("query", {"a": 0}),
+                        ("update", update_spec),
+                        ("new", True),
+                    ]
+                )
+            )["value"]
             # Stringify _id to match what will be retrieved from ES
-            updated['_id'] = str(updated['_id'])
+            updated["_id"] = str(updated["_id"])
             assert_soon(lambda: next(self._search()) == updated)
 
         # Update by adding a field. Note that ES can't mix types within an array
@@ -217,37 +216,37 @@ class TestElastic(ElasticsearchTestCase):
         primary_conn = self.repl_set.primary.client()
 
         # This doc can be picked up in the collection dump
-        self.conn['test']['test'].insert_one({'name': 'paul'})
-        condition1 = lambda: self.conn['test']['test'].find(
-            {'name': 'paul'}).count() == 1
+        self.conn["test"]["test"].insert_one({"name": "paul"})
+        condition1 = (
+            lambda: self.conn["test"]["test"].find({"name": "paul"}).count() == 1
+        )
         condition2 = lambda: self._count() == 1
         assert_soon(condition1)
         assert_soon(condition2)
 
         # This doc is definitely not picked up by collection dump
-        self.conn['test']['test'].insert_one({'name': 'pauly'})
+        self.conn["test"]["test"].insert_one({"name": "pauly"})
 
         self.repl_set.primary.stop(destroy=False)
 
         new_primary_conn = self.repl_set.secondary.client()
 
-        admin = new_primary_conn['admin']
-        assert_soon(lambda: admin.command("isMaster")['ismaster'])
+        admin = new_primary_conn["admin"]
+        assert_soon(lambda: admin.command("isMaster")["ismaster"])
         time.sleep(5)
-        retry_until_ok(self.conn.test.test.insert_one,
-                       {'name': 'pauline'})
+        retry_until_ok(self.conn.test.test.insert_one, {"name": "pauline"})
         assert_soon(lambda: self._count() == 3)
         result_set_1 = list(self._search())
-        result_set_2 = self.conn['test']['test'].find_one({'name': 'pauline'})
+        result_set_2 = self.conn["test"]["test"].find_one({"name": "pauline"})
         self.assertEqual(len(result_set_1), 3)
-        #make sure pauline is there
+        # make sure pauline is there
         for item in result_set_1:
-            if item['name'] == 'pauline':
-                self.assertEqual(item['_id'], str(result_set_2['_id']))
+            if item["name"] == "pauline":
+                self.assertEqual(item["_id"], str(result_set_2["_id"]))
         self.repl_set.secondary.stop(destroy=False)
 
         self.repl_set.primary.start()
-        while primary_conn['admin'].command("isMaster")['ismaster'] is False:
+        while primary_conn["admin"].command("isMaster")["ismaster"] is False:
             time.sleep(1)
 
         self.repl_set.secondary.start()
@@ -256,25 +255,25 @@ class TestElastic(ElasticsearchTestCase):
         result_set_1 = list(self._search())
         self.assertEqual(len(result_set_1), 2)
 
-        if result_set_1[0]['name'] == 'paul':
-            self.assertEqual(result_set_1[1]['name'], 'pauly')
-        elif result_set_1[0]['name'] == 'pauly':
-            self.assertEqual(result_set_1[1]['name'], 'paul')
+        if result_set_1[0]["name"] == "paul":
+            self.assertEqual(result_set_1[1]["name"], "pauly")
+        elif result_set_1[0]["name"] == "pauly":
+            self.assertEqual(result_set_1[1]["name"], "paul")
         else:
-            self.assertTrue(0, 'Unknown document retrieved')
+            self.assertTrue(0, "Unknown document retrieved")
 
-        find_cursor = retry_until_ok(self.conn['test']['test'].find)
+        find_cursor = retry_until_ok(self.conn["test"]["test"].find)
         self.assertEqual(retry_until_ok(find_cursor.count), 2)
 
     def test_bad_int_value(self):
-        self.conn.test.test.insert_one({
-            'inf': float('inf'), 'nan': float('nan'),
-            'still_exists': True})
+        self.conn.test.test.insert_one(
+            {"inf": float("inf"), "nan": float("nan"), "still_exists": True}
+        )
         assert_soon(lambda: self._count() > 0)
         for doc in self._search():
-            self.assertNotIn('inf', doc)
-            self.assertNotIn('nan', doc)
-            self.assertTrue(doc['still_exists'])
+            self.assertNotIn("inf", doc)
+            self.assertNotIn("nan", doc)
+            self.assertTrue(doc["still_exists"])
 
 
 class TestElasticMultipleHosts(unittest.TestCase):
@@ -285,5 +284,5 @@ class TestElasticMultipleHosts(unittest.TestCase):
         self.assertEqual(len(elastic_doc.elastic.transport.hosts), 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
