@@ -1,12 +1,7 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from ez_setup import use_setuptools
-
-    use_setuptools()
-    from setuptools import setup
 import os
 import sys
+
+import setuptools
 
 # To test against an Elasticsearch 5.x server we need to use the 5.x
 # Python Elasticsearch client, see .travis.yml.
@@ -30,6 +25,7 @@ except IOError:
     long_description = None  # Install without README.rst
 
 
+setuptools.\
 setup(name='elastic2-doc-manager',
       version='0.3.0',
       maintainer='mongodb',
