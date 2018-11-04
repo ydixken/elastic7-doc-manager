@@ -1,18 +1,10 @@
 import setuptools
 
-try:
-    with open("README.rst", "r") as fd:
-        long_description = fd.read()
-except IOError:
-    long_description = None  # Install without README.rst
-
-
 setuptools.setup(
     name="elastic2-doc-manager",
     version="0.4.0",
     maintainer="mongodb",
     description="Elastic2 plugin for mongo-connector",
-    long_description=long_description,
     platforms=["any"],
     author="anna herlihy",
     author_email="mongodb-user@googlegroups.com",
