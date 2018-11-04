@@ -24,7 +24,6 @@ setuptools.setup(
         "elastic5": ["elasticsearch>=5.0.0,<6.0.0"],
     },
     packages=["mongo_connector", "mongo_connector.doc_managers"],
-    license="Apache License, Version 2.0",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
