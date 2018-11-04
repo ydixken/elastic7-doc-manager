@@ -15,17 +15,10 @@ import logging
 import os
 import sys
 
+
 logging.basicConfig(stream=sys.stdout)
 
-if sys.version_info[0] == 3:
-    unicode = str
-
-if sys.version_info[:2] == (2, 6):
-    import unittest2 as unittest
-else:
-    import unittest  # noqa
-
-elastic_host = unicode(os.environ.get("ES_HOST", "localhost"))
-elastic_port = unicode(os.environ.get("ES_PORT", 9200))
+elastic_host = str(os.environ.get("ES_HOST", "localhost"))
+elastic_port = str(os.environ.get("ES_PORT", 9200))
 elastic_pair = "%s:%s" % (elastic_host, elastic_port)
-elastic_nodes = [elastic_pair, "%s:%s" % (elastic_host, unicode(int(elastic_port) + 1))]
+elastic_nodes = [elastic_pair, "%s:%s" % (elastic_host, str(int(elastic_port) + 1))]

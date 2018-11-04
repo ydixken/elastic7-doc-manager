@@ -15,6 +15,7 @@
 """Unit tests for the Elastic2 DocManager."""
 import base64
 import time
+import unittest
 
 from functools import wraps
 
@@ -29,7 +30,7 @@ from mongo_connector.doc_managers.elastic2_doc_manager import (
 from mongo_connector.test_utils import MockGridFSFile, TESTARGS
 from mongo_connector.util import retry_until_ok
 
-from tests import unittest, elastic_pair
+from tests import elastic_pair
 from tests.test_elastic2 import ElasticsearchTestCase
 
 
