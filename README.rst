@@ -4,19 +4,19 @@ elastic2-doc-manager
 
 Ownership of the elastic2-doc-manager repo has been transferred to YouGov.  MongoDB would like to thank Jason Coombs, Executive Technical Director at YouGov, for agreeing to maintain this project.
 
-.. image:: https://travis-ci.org/mongodb-labs/elastic2-doc-manager.svg?branch=master
+.. image:: https://travis-ci.org/yougov/elastic2-doc-manager.svg?branch=master
    :alt: View build status
-   :target: https://travis-ci.org/mongodb-labs/elastic2-doc-manager
+   :target: https://travis-ci.org/yougov/elastic2-doc-manager
 
 Getting Started
 ===============
 
 This package is a document manager for
-`mongo-connector <https://github.com/mongodb-labs/mongo-connector>`_ that
+`mongo-connector <https://github.com/yougov/mongo-connector>`_ that
 targets Elasticsearch versions 2.x and 5.x -- don't let the name fool you!
 For information on running mongo-connector with Elasticsearch, please see the
 `MongoConnector Usage with Elasticsearch
-<https://github.com/mongodb-labs/mongo-connector/wiki/Usage%20with%20ElasticSearch>`_
+<https://github.com/yougov/mongo-connector/wiki/Usage%20with%20ElasticSearch>`_
 wiki page.
 
 Installation
@@ -30,7 +30,7 @@ Elasticsearch 1.x
 
 This is the document manager for Elasticsearch 2.x and 5.x. If you
 want to target Elasticsearch 1.x, please install the
-`elastic-doc-manager <https://github.com/mongodb-labs/elastic-doc-manager>`_.
+`elastic-doc-manager <https://github.com/yougov/elastic-doc-manager>`_.
 
 Elasticsearch 2.x
 -----------------
@@ -65,7 +65,7 @@ Development
 You can also install the development version of elastic2-doc-manager
 manually::
 
-  git clone https://github.com/mongodb-labs/elastic2-doc-manager.git
+  git clone https://github.com/yougov/elastic2-doc-manager.git
   pip install -e './elastic2-doc-manager[elastic2]'
 
 You may have to run ``pip`` with ``sudo``, depending on where you're
@@ -85,7 +85,7 @@ Requirements
   The tests are not included in the package from PyPI and can only be acquired
   by cloning this repository on Github::
 
-      git clone https://github.com/mongodb-labs/elastic2-doc-manager
+      git clone https://github.com/yougov/elastic2-doc-manager
 
 2. Mongo Orchestration
 
