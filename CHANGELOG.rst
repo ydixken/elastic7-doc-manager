@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 1.0.0
+-------------
+
+- Drop support for Python 3.3 and earlier, including Python 2.
+
 Version 0.4.0
 -------------
 

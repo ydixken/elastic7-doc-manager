@@ -14,23 +14,14 @@ env:
     # We need to manually set JAVA_HOME to Java 8 too.
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
 
-matrix:
-  allow_failures:
-  - python: 2.6
-  - python: 3.3
-
 jobs:
   fast_finish: true
   include:
-  - python: 2.6
-    env: MONGODB=3.4.1 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL TOXENV=elastic5
-  - python: 2.7
+  - python: &latest_py3 3.6
     env: MONGODB=3.2.11 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL TOXENV=elastic5
-  - python: 3.3
-    env: MONGODB=3.0.14 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL TOXENV=elastic5
   - python: 3.4
     env: MONGODB=2.6.12 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL TOXENV=elastic2
-  - python: &latest_py3 3.5
+  - python: 3.5
     env: MONGODB=2.4.14 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL TOXENV=elastic2
   - stage: deploy
     if: tag IS present

@@ -16,6 +16,7 @@
 import base64
 import os
 import time
+import unittest
 
 from bson import SON
 from elasticsearch import Elasticsearch
@@ -27,7 +28,7 @@ from mongo_connector.doc_managers.elastic2_doc_manager import DocManager
 from mongo_connector.test_utils import ReplicaSet, assert_soon, close_client
 
 from mongo_connector.util import retry_until_ok
-from tests import unittest, elastic_pair, elastic_nodes
+from tests import elastic_pair, elastic_nodes
 
 
 class ElasticsearchTestCase(unittest.TestCase):
