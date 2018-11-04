@@ -88,35 +88,14 @@ Requirements
 
       git clone https://github.com/yougov/elastic2-doc-manager
 
-2. Mongo Orchestration
+2. Tox
 
-  Mongo Connector runs MongoDB on its own using another tool called
-  `Mongo Orchestration <https://github.com/mongodb/mongo-orchestration>`__.
-  This package should install automatically if you run ``python setup.py test``,
-  but the Mongo Orchestration server still needs to be started manually before
-  running the tests::
+  Install `tox <https://pypi.org/project/tox>`_.
 
-      mongo-orchestration --bind 127.0.0.1 --config orchestration.config start
+2. Environment variables
 
-  will start the server. To stop it::
-
-      mongo-orchestration --bind 127.0.0.1 --config orchestration.config stop
-
-  The location of the MongoDB server should be set in orchestration.config.
-  For more information on how to use Mongo Orchestration, or how to use it with
-  different arguments, please look at the Mongo-Orchestration README.
-
-3. Environment variables
-
-  There are a few influential environment variables that affect the tests. These are:
-
-    - ``DB_USER`` is the username to use if running the tests with authentication enabled.
-    - ``DB_PASSWORD`` is the password for the above.
-    - ``MONGO_PORT`` is the starting port for running MongoDB. Future nodes will be started on sequentially increasing ports.
-    - ``ES_HOST`` is the hostname on which Elasticsearch is running.
-    - ``ES_PORT`` is the port on which Elasticsearch is running.
-    - ``MO_ADDRESS`` is the address to use for Mongo Orchestration (i.e. hostname:port)
-    - ``PYTHON_ELASTIC_VERSION`` is the pip style version of Elasticsearch to test with (eg >=5.0.0,<6.0.0)
+  There are a few influential environment variables that affect the tests. These are
+  defined in the tox.ini.
 
 All the tests live in the `tests` directory.
 
@@ -128,13 +107,7 @@ their own, make sure to start Elasticsearch before doing a full test run!
 
 You can run all the tests with one command (this works in all supported Python versions)::
 
-  python setup.py test
-
-In addition, you can be more selective with which tests you run
-in Python > 2.6 only)! For example, if you only wanted to run the elastic2
-doc manager tests::
-
-  python -m unittest tests.test_elastic2_doc_manager
+  tox
 
 Error messages
 ~~~~~~~~~~~~~~
