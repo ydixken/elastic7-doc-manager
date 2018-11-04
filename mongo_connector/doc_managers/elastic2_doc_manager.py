@@ -26,7 +26,7 @@ import warnings
 import bson.json_util
 
 try:
-    __import__('elasticsearch')
+    __import__("elasticsearch")
 except ImportError:
     raise ImportError(
         "Error: elasticsearch (https://pypi.python.org/pypi/elasticsearch) "
@@ -45,7 +45,6 @@ from elasticsearch import (
 from elasticsearch.helpers import bulk, scan, streaming_bulk, BulkIndexError
 
 from mongo_connector import errors
-from mongo_connector.compat import u
 from mongo_connector.constants import DEFAULT_COMMIT_INTERVAL, DEFAULT_MAX_BULK
 from mongo_connector.util import exception_wrapper, retry_until_ok
 from mongo_connector.doc_managers.doc_manager_base import DocManagerBase
@@ -298,7 +297,9 @@ class DocManager(DocManagerBase):
         index, doc_type = self._index_and_mapping(namespace)
         with self.lock:
             # Check if document source is stored in local buffer
-            document = self.BulkBuffer.get_from_sources(index, doc_type, u(document_id))
+            document = self.BulkBuffer.get_from_sources(
+                index, doc_type, str(document_id)
+            )
         if document:
             # Document source collected from local buffer
             # Perform apply_update on it and then it will be
@@ -320,7 +321,7 @@ class DocManager(DocManagerBase):
         """Insert a document into Elasticsearch."""
         index, doc_type = self._index_and_mapping(namespace)
         # No need to duplicate '_id' in source document
-        doc_id = u(doc.pop("_id"))
+        doc_id = str(doc.pop("_id"))
         metadata = {"ns": namespace, "_ts": timestamp}
 
         # Index the source document, using lowercase namespace as index name.
@@ -354,7 +355,7 @@ class DocManager(DocManagerBase):
             for doc in docs:
                 # Remove metadata and redundant _id
                 index, doc_type = self._index_and_mapping(namespace)
-                doc_id = u(doc.pop("_id"))
+                doc_id = str(doc.pop("_id"))
                 document_action = {
                     "_index": index,
                     "_type": doc_type,
@@ -440,14 +441,14 @@ class DocManager(DocManagerBase):
             "_op_type": "delete",
             "_index": index,
             "_type": doc_type,
-            "_id": u(document_id),
+            "_id": str(document_id),
         }
 
         meta_action = {
             "_op_type": "delete",
             "_index": self.meta_index_name,
             "_type": self.meta_type,
-            "_id": u(document_id),
+            "_id": str(document_id),
         }
 
         self.index(action, meta_action)

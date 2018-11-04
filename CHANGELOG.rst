@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.4.0
+-------------
+
+- Remove reliance on ``mongo_connector.compat``.
+
 Version 0.3.0
 -------------
 

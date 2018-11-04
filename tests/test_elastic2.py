@@ -220,6 +220,7 @@ class TestElastic(ElasticsearchTestCase):
 
         def condition2():
             return self._count() == 1
+
         assert_soon(condition1)
         assert_soon(condition2)
 
