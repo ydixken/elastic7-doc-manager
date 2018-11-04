@@ -74,8 +74,7 @@ DEFAULT_SEND_INTERVAL = 5
 
 DEFAULT_AWS_REGION = "us-east-1"
 
-__version__ = "0.3.0"
-"""Elasticsearch 2.X DocManager version."""
+__version__ = "0.4.0"
 
 
 def convert_aws_args(aws_args):
