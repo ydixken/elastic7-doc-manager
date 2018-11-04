@@ -1,23 +1,4 @@
-import os
-import sys
-
 import setuptools
-
-# To test against an Elasticsearch 5.x server we need to use the 5.x
-# Python Elasticsearch client, see .travis.yml.
-PYTHON_ELASTIC_VERSION = os.environ.get("PYTHON_ELASTIC_VERSION", ">=2.0.0,<3.0.0")
-
-test_suite = "tests"
-tests_require = [
-    "mongo-orchestration>=0.6.7,<1.0",
-    "requests>=2.5.1",
-    "elasticsearch" + PYTHON_ELASTIC_VERSION,
-]
-
-if sys.version_info[:2] == (2, 6):
-    # Need unittest2 to run unittests in Python 2.6
-    tests_require.append("unittest2")
-    test_suite = "unittest2.collector"
 
 try:
     with open("README.rst", "r") as fd:
@@ -61,6 +42,4 @@ setuptools.setup(
         "Operating System :: POSIX",
     ],
     keywords=["mongo-connector", "mongodb", "elastic", "elasticsearch"],
-    test_suite=test_suite,
-    tests_require=tests_require,
 )
