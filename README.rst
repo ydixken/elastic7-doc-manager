@@ -2,7 +2,8 @@
 elastic2-doc-manager
 ====================
 
-Ownership of the elastic2-doc-manager repo has been transferred to YouGov.  MongoDB would like to thank Jason Coombs, Executive Technical Director at YouGov, for agreeing to maintain this project.
+The mongo-connector project originated as a MongoDB mongo-labs
+project and is now community-maintained under the custody of YouGov, Plc.
 
 .. image:: https://travis-ci.org/yougov/elastic2-doc-manager.svg?branch=master
    :alt: View build status
