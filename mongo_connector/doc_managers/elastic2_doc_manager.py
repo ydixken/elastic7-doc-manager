@@ -76,7 +76,7 @@ DEFAULT_SEND_INTERVAL = 5
 
 DEFAULT_AWS_REGION = "us-east-1"
 
-__version__ = importlib_metadata.version("elastic2-doc-manager")
+__version__ = importlib_metadata.version("elastic2_doc_manager")
 
 
 def convert_aws_args(aws_args):
