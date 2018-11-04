@@ -9,7 +9,6 @@ addons:
 
 env:
   global:
-    - MO_ADDRESS=127.0.0.1:20000
     - ELASTIC_2_URL=http://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.3/elasticsearch-2.4.3.tar.gz
     - ELASTIC_5_URL=http://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.tar.gz
     # We need to manually set JAVA_HOME to Java 8 too.
@@ -19,15 +18,15 @@ jobs:
   fast_finish: true
   include:
   - python: 2.6
-    env: MONGODB=3.4.1 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL PYTHON_ELASTIC_VERSION='>=5.0.0,<6.0.0'
+    env: MONGODB=3.4.1 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL TOXENV=elastic5
   - python: 2.7
-    env: MONGODB=3.2.11 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL PYTHON_ELASTIC_VERSION='>=5.0.0,<6.0.0'
+    env: MONGODB=3.2.11 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL TOXENV=elastic5
   - python: 3.3
-    env: MONGODB=3.0.14 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL PYTHON_ELASTIC_VERSION='>=5.0.0,<6.0.0'
+    env: MONGODB=3.0.14 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL TOXENV=elastic5
   - python: 3.4
-    env: MONGODB=2.6.12 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL PYTHON_ELASTIC_VERSION='>=2.0.0,<3.0.0'
+    env: MONGODB=2.6.12 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL TOXENV=elastic2
   - python: &latest_py3 3.5
-    env: MONGODB=2.4.14 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL PYTHON_ELASTIC_VERSION='>=2.0.0,<3.0.0'
+    env: MONGODB=2.4.14 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL TOXENV=elastic2
   - stage: deploy
     if: tag IS present
     python: *latest_py3
@@ -57,16 +56,11 @@ install:
   - tar -zxf mongodb-linux-x86_64-${MONGODB}.tgz
   - export PATH=${PWD}/mongodb-linux-x86_64-${MONGODB}/bin/:${PATH}
   - mongod --version
-  - # Install MongoOrchestration
-  - pip install "mongo-orchestration>=0.6.7,<1.0"
+  - pip install -U tox tox-venv
 
 before_script:
   - elasticsearch > temp.txt &
   - sleep 10
-  - mongo-orchestration start -p 20000 -b 127.0.0.1
 
 script:
-  - python setup.py test
-
-after_script:
-  - mongo-orchestration stop
+  - tox
