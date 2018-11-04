@@ -26,7 +26,7 @@ import warnings
 import bson.json_util
 
 try:
-    import elasticsearch
+    __import__('elasticsearch')
 except ImportError:
     raise ImportError(
         "Error: elasticsearch (https://pypi.python.org/pypi/elasticsearch) "

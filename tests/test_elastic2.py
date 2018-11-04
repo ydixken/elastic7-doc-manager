@@ -15,15 +15,12 @@
 """Integration tests for mongo-connector + Elasticsearch 2.x."""
 import base64
 import os
-import sys
 import time
 
 from bson import SON
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk, scan
 from gridfs import GridFS
-
-sys.path[0:0] = [""]
 
 from mongo_connector.connector import Connector
 from mongo_connector.doc_managers.elastic2_doc_manager import DocManager
@@ -220,7 +217,9 @@ class TestElastic(ElasticsearchTestCase):
         condition1 = (
             lambda: self.conn["test"]["test"].find({"name": "paul"}).count() == 1
         )
-        condition2 = lambda: self._count() == 1
+
+        def condition2():
+            return self._count() == 1
         assert_soon(condition1)
         assert_soon(condition2)
 

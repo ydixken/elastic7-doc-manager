@@ -14,12 +14,9 @@
 
 """Unit tests for the Elastic2 DocManager."""
 import base64
-import sys
 import time
 
 from functools import wraps
-
-sys.path[0:0] = [""]
 
 from mongo_connector import errors
 from mongo_connector.command_helper import CommandHelper
@@ -140,17 +137,6 @@ class TestElasticDocManager(ElasticsearchTestCase):
 
         # set auto_commit_interval back to 0
         self.elastic_doc.auto_commit_interval = 0
-
-    def test_upsert(self):
-        """Test the upsert method."""
-        docc = {"_id": "1", "name": "John"}
-        self.elastic_doc.upsert(docc, *TESTARGS)
-        res = self.elastic_conn.search(
-            index="test", doc_type="test", body={"query": {"match_all": {}}}
-        )["hits"]["hits"]
-        for doc in res:
-            self.assertEqual(doc["_id"], "1")
-            self.assertEqual(doc["_source"]["name"], "John")
 
     def test_upsert_with_updates(self):
         """Test the upsert method with multi updates

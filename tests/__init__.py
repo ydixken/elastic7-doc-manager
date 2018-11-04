@@ -23,7 +23,7 @@ if sys.version_info[0] == 3:
 if sys.version_info[:2] == (2, 6):
     import unittest2 as unittest
 else:
-    import unittest
+    import unittest  # noqa
 
 elastic_host = unicode(os.environ.get("ES_HOST", "localhost"))
 elastic_port = unicode(os.environ.get("ES_PORT", 9200))
