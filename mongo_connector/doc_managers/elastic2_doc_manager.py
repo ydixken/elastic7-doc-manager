@@ -32,9 +32,9 @@ except ImportError:
         "Error: elasticsearch (https://pypi.python.org/pypi/elasticsearch) "
         "version 2.x or 5.x is not installed.\n"
         "Install with:\n"
-        "  pip install elastic-doc-manager[elastic2]\n"
+        "  pip install elastic2-doc-manager[elastic2]\n"
         "or:\n"
-        "  pip install elastic-doc-manager[elastic5]\n"
+        "  pip install elastic2-doc-manager[elastic5]\n"
     )
 
 from elasticsearch import (
