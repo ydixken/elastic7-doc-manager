@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Integration tests for mongo-connector + Elasticsearch 2.x."""
+"""Integration tests for mongo-connector + Elasticsearch 7.x."""
 import base64
 import os
 import time
@@ -40,26 +40,26 @@ class ElasticsearchTestCase(unittest.TestCase):
 
     def setUp(self):
         # Create target index in elasticsearch
-        self.elastic_conn.indices.create(index="test", ignore=400)
-        self.elastic_conn.cluster.health(wait_for_status="yellow", index="test")
+        self.elastic_conn.indices.create(index="test_test", ignore=400)
+        self.elastic_conn.cluster.health(wait_for_status="yellow", index="test_test")
         self.elastic_doc = DocManager(elastic_pair, auto_commit_interval=0)
 
     def tearDown(self):
-        self.elastic_conn.indices.delete(index="test", ignore=404)
+        self.elastic_conn.indices.delete(index="test_test", ignore=404)
         self.elastic_doc.stop()
 
     def _search(self, query=None):
         query = query or {"match_all": {}}
         return self.elastic_doc._stream_search(
-            index="test", doc_type="test", body={"query": query}
+            index="test_test", body={"query": query}
         )
 
     def _count(self):
-        return self.elastic_conn.count(index="test")["count"]
+        return self.elastic_conn.count(index="test_test")["count"]
 
     def _remove(self):
         bulk_deletes = []
-        for result in scan(self.elastic_conn, index="test", doc_type="test"):
+        for result in scan(self.elastic_conn, index="test_test"):
             result["_op_type"] = "delete"
             bulk_deletes.append(result)
         bulk(self.elastic_conn, bulk_deletes)

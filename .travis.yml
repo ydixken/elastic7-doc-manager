@@ -7,6 +7,14 @@ addons:
     packages:
       - oracle-java8-set-default
 
+services:
+  - docker
+
+before_install:
+  - docker-compose -f docker-compose.test.yml up
+  # wait for ES to be active
+  # wait for mongo to be active
+
 env:
   global:
     - ELASTIC_2_URL=http://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.3/elasticsearch-2.4.3.tar.gz
@@ -28,16 +36,6 @@ jobs:
     python: *latest_py3
     install: skip
     script: skip
-    deploy:
-      provider: pypi
-      on:
-        tags: true
-        all_branches: true
-      user: jaraco
-      password:
-        secure: rx5Yz5qT+wPWiT+wOn0+U3F4G0Kk/rouMkJeOnGNxb/NHWwc9iFqeLRRw5rWyF6COPMuKh32MlMIdL7EQNPyadEZ9djtPWC5csJYNLJAH/VC/+vZd5ZEwbsp1BYB+dZqUSUf7+G1yANvi4jd6x8zK1M9FHtL+LrWda/t2gsJePIx9rzm5PVHZO9GX9+ljb+pKP2Pk768BqL43z8tPOmlue/ONiC5OEc1Bd2mmxSm3ObaFqAJyr8F05GF90SNxZ8E+eCZFLGG4os5ul3yqjCTAFx9edRgXZVZmBInp6nzF0R69PZvJQj/+yyIUcZdrpZra9Glnc5tXNCx2EA9qChMD0aTsFyWvtRTk3AREzd9Ph4oSJ25jxjdDfaGkNDJvMIp7WeGLwuYpZtQ/IKlA7Nvjt5IcYYvzLWWpsA/EamBIglJn1SyYRmbXo2j3xymMF1jVskXgNO/nt9U9rPQApPUVXjuTGUsu1tbqzQG1Hnm+Mo3vbwkmj4DYoa7XcE+WXs2Mtk5cHsMdlBapnEB9bn5reuK4cvSOidbZNgsm8ObI6Yk6pRU/gTiy5wBcH4NGy9vvK0IxFT2/I+q83HtJk/JRu1m7ImRYEluG+0y5HLi444rY2zcrdGq54UFdvLbgXkxJsj91au7NHyvukbZ3KchvK2937rrn3WgBcD24T0qfEc=
-      distributions: dists
-      skip_cleanup: true
 
 install:
   - java -version
