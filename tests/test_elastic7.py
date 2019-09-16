@@ -17,6 +17,7 @@ import base64
 import os
 import time
 import unittest
+import logging
 
 from bson import SON
 from elasticsearch import Elasticsearch
@@ -37,6 +38,8 @@ class ElasticsearchTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.elastic_conn = Elasticsearch(hosts=[elastic_pair])
+        es_logger = logging.getLogger('elasticsearch')
+        es_logger.setLevel(logging.DEBUG)
 
     def setUp(self):
         # Create target index in elasticsearch
