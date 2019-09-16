@@ -17,7 +17,6 @@ import base64
 import os
 import time
 import unittest
-import logging
 
 from bson import SON
 from elasticsearch import Elasticsearch
@@ -38,8 +37,6 @@ class ElasticsearchTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.elastic_conn = Elasticsearch(hosts=[elastic_pair])
-        es_logger = logging.getLogger('elasticsearch')
-        es_logger.setLevel(logging.DEBUG)
 
     def setUp(self):
         # Create target index in elasticsearch
@@ -149,6 +146,10 @@ class TestElastic(ElasticsearchTestCase):
         id = fs.put(test_data, filename="test.txt", encoding="utf8")
         assert_soon(lambda: self._count() > 0)
 
+        doc = self._search({
+            "match_all": {}
+        })
+        raise Exception(doc)
         query = {"match": {"_all": "test_insert_file"}}
         res = list(self._search(query))
         self.assertEqual(len(res), 1)
