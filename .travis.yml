@@ -12,16 +12,11 @@ jobs:
   fast_finish: true
   include:
   - python: &latest_py3 3.6
-    env: MONGODB=3.2.11 TOXENV=elastic5
+    env: MONGODB=3.2.11 TOXENV=elastic7
   - python: 3.4
-    env: MONGODB=2.6.12 TOXENV=elastic2
+    env: MONGODB=2.6.12 TOXENV=elastic7
   - python: 3.5
-    env: MONGODB=2.4.14 TOXENV=elastic2
-  - stage: deploy
-    if: tag IS present
-    python: *latest_py3
-    install: skip
-    script: skip
+    env: MONGODB=2.4.14 TOXENV=elastic7
 
 install:
   - # Install MongoDB
