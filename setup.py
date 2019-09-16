@@ -4,7 +4,7 @@ setuptools.setup(
     name="elastic7-doc-manager",
     use_scm_version=True,
     maintainer="mongodb",
-    description="Elastic2 plugin for mongo-connector",
+    description="Elastic7 plugin for mongo-connector",
     platforms=["any"],
     author="anna herlihy",
     author_email="mongodb-user@googlegroups.com, tharun@nineleaps.com",

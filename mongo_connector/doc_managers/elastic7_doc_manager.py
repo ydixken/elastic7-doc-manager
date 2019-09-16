@@ -277,7 +277,6 @@ class DocManager(DocManagerBase):
             if db and coll:
                 self.elastic.indices.put_mapping(
                     index=self._get_es_index(db, coll),
-                    doc_type='_doc',
                     body={"_source": {"enabled": True}}
                 )
 
@@ -287,11 +286,6 @@ class DocManager(DocManagerBase):
                 # This will delete the items in coll, but not get rid of the
                 # mapping.
                 es_index = self._get_es_index(db, coll)
-                warnings.warn(
-                    "Deleting all documents of on index %s."
-                    "The mapping definition will persist and must be"
-                    "removed manually." % (es_index)
-                )
                 self.elastic.indices.delete(es_index, ignore=[404])
 
     @wrap_exceptions
