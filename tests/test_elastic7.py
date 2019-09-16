@@ -24,7 +24,7 @@ from elasticsearch.helpers import bulk, scan
 from gridfs import GridFS
 
 from mongo_connector.connector import Connector
-from mongo_connector.doc_managers.elastic2_doc_manager import DocManager
+from mongo_connector.doc_managers.elastic7_doc_manager import DocManager
 from mongo_connector.test_utils import ReplicaSet, assert_soon, close_client
 
 from mongo_connector.util import retry_until_ok

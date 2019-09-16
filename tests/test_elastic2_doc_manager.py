@@ -21,7 +21,7 @@ from functools import wraps
 
 from mongo_connector import errors
 from mongo_connector.command_helper import CommandHelper
-from mongo_connector.doc_managers.elastic2_doc_manager import (
+from mongo_connector.doc_managers.elastic7_doc_manager import (
     DocManager,
     _HAS_AWS,
     convert_aws_args,
@@ -31,7 +31,7 @@ from mongo_connector.test_utils import MockGridFSFile, TESTARGS
 from mongo_connector.util import retry_until_ok
 
 from tests import elastic_pair
-from tests.test_elastic2 import ElasticsearchTestCase
+from tests.test_elastic7 import ElasticsearchTestCase
 
 
 def disable_auto_refresh(func):
