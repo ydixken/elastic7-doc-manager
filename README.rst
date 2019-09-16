@@ -2,7 +2,13 @@
 elastic7-doc-manager
 ====================
 
-Forked from original elastic2-doc-manager
+Forked from original elastic2-doc-manager to support ES 7.x
+
+Read the following sections if you are interested in older versions of elasticsearch.
+
+To see an example, check: https://github.com/tmpaul06/es7-mongo-example
+
+# Original Docs
 
 The mongo-connector project originated as a MongoDB mongo-labs
 project and is now community-maintained under the custody of YouGov, Plc.
