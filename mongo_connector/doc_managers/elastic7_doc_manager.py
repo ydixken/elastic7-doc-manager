@@ -328,7 +328,6 @@ class DocManager(DocManagerBase):
         action = {
             "_op_type": "index",
             "_index": index,
-            "_type": doc_type,
             "_id": doc_id,
             "_source": self._formatter.format_document(doc),
         }
@@ -358,13 +357,11 @@ class DocManager(DocManagerBase):
                 doc_id = str(doc.pop("_id"))
                 document_action = {
                     "_index": index,
-                    "_type": doc_type,
                     "_id": doc_id,
                     "_source": self._formatter.format_document(doc),
                 }
                 document_meta = {
                     "_index": self.meta_index_name,
-                    "_type": self.meta_type,
                     "_id": doc_id,
                     "_source": {"ns": namespace, "_ts": timestamp},
                 }
@@ -407,7 +404,7 @@ class DocManager(DocManagerBase):
         # make sure that elasticsearch treats it like a file
         if not self.has_attachment_mapping:
             body = {"properties": {self.attachment_field: {"type": "attachment"}}}
-            self.elastic.indices.put_mapping(index=index, doc_type=doc_type, body=body)
+            self.elastic.indices.put_mapping(index=index, body=body)
             self.has_attachment_mapping = True
 
         metadata = {"ns": namespace, "_ts": timestamp}
@@ -418,7 +415,6 @@ class DocManager(DocManagerBase):
         action = {
             "_op_type": "index",
             "_index": index,
-            "_type": doc_type,
             "_id": doc_id,
             "_source": doc,
         }
@@ -440,7 +436,6 @@ class DocManager(DocManagerBase):
         action = {
             "_op_type": "delete",
             "_index": index,
-            "_type": doc_type,
             "_id": str(document_id),
         }
 
