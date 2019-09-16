@@ -1,36 +1,22 @@
 sudo: false
 language: python
 
-# Elasticsearch 5 requires Java 8
-addons:
-  apt:
-    packages:
-      - oracle-java8-set-default
-
 services:
   - docker
 
 before_install:
   - docker-compose -f docker-compose.test.yml up
-  # wait for ES to be active
-  # wait for mongo to be active
-
-env:
-  global:
-    - ELASTIC_2_URL=http://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.3/elasticsearch-2.4.3.tar.gz
-    - ELASTIC_5_URL=http://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.tar.gz
-    # We need to manually set JAVA_HOME to Java 8 too.
-    - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+  - sleep 10
 
 jobs:
   fast_finish: true
   include:
   - python: &latest_py3 3.6
-    env: MONGODB=3.2.11 ELASTIC=5.1.1 ELASTIC_URL=$ELASTIC_5_URL TOXENV=elastic5
+    env: MONGODB=3.2.11 TOXENV=elastic5
   - python: 3.4
-    env: MONGODB=2.6.12 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL TOXENV=elastic2
+    env: MONGODB=2.6.12 TOXENV=elastic2
   - python: 3.5
-    env: MONGODB=2.4.14 ELASTIC=2.4.3 ELASTIC_URL=$ELASTIC_2_URL TOXENV=elastic2
+    env: MONGODB=2.4.14 TOXENV=elastic2
   - stage: deploy
     if: tag IS present
     python: *latest_py3
@@ -38,23 +24,12 @@ jobs:
     script: skip
 
 install:
-  - java -version
-  - # Install Elasticsearch with mapper-attachments
-  - wget $ELASTIC_URL
-  - tar -xvf elasticsearch-${ELASTIC}.tar.gz
-  - export PATH=${PWD}/elasticsearch-${ELASTIC}/bin/:${PATH}
-  - echo 'y' |  elasticsearch-plugin install mapper-attachments || echo 'y' |  plugin install mapper-attachments
-  - elasticsearch --version
   - # Install MongoDB
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz
   - tar -zxf mongodb-linux-x86_64-${MONGODB}.tgz
   - export PATH=${PWD}/mongodb-linux-x86_64-${MONGODB}/bin/:${PATH}
   - mongod --version
   - pip install -U tox tox-venv
-
-before_script:
-  - elasticsearch > temp.txt &
-  - sleep 10
 
 script:
   - tox
