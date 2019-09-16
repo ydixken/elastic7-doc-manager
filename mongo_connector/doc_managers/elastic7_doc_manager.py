@@ -261,7 +261,7 @@ class DocManager(DocManagerBase):
             dbs = self.command_helper.map_db(db)
             for _db in dbs:
                 self.elastic.indices.delete(
-                    self._get_es_index(db, '*')
+                    self._get_es_index(_db, '*')
                 )
 
         if doc.get("renameCollection"):
@@ -294,11 +294,11 @@ class DocManager(DocManagerBase):
         matches that of doc.
         """
 
-        index, doc_type = self._index_and_mapping(namespace)
+        index, _ = self._index_and_mapping(namespace)
         with self.lock:
             # Check if document source is stored in local buffer
             document = self.BulkBuffer.get_from_sources(
-                index, doc_type, str(document_id)
+                index, str(document_id)
             )
         if document:
             # Document source collected from local buffer
@@ -548,11 +548,11 @@ class BulkBuffer(object):
         # Below dictionary contains ids of documents
         # which need to be retrieved from Elasticsearch
         # It prevents from getting same document multiple times from ES
-        # Format: {"_index": {"_type": {"_id": True}}}
+        # Format: {"_index": {"_id": True}}
         self.doc_to_get = {}
 
         # Dictionary of sources
-        # Format: {"_index": {"_type": {"_id": {"_source": actual_source}}}}
+        # Format: {"_index": {"_id": {"_source": actual_source}}}
         self.sources = {}
 
     def add_upsert(self, action, meta_action, doc_source, update_spec):
@@ -591,7 +591,6 @@ class BulkBuffer(object):
 
         doc = {
             "_index": action["_index"],
-            "_type": action["_type"],
             "_id": action["_id"],
         }
 
@@ -606,9 +605,7 @@ class BulkBuffer(object):
             True - if marking document for the first time in this bulk
             False - if document has been already marked
         """
-        mapping_ids = self.doc_to_get.setdefault(action["_index"], {}).setdefault(
-            action["_type"], set()
-        )
+        mapping_ids = self.doc_to_get.setdefault(action["_index"], set())
         if action["_id"] in mapping_ids:
             # There is an update on this id already
             return False
@@ -651,7 +648,7 @@ class BulkBuffer(object):
             else:
                 # Get source stored locally before applying update
                 # as it is up-to-date
-                source = self.get_from_sources(doc["_index"], doc["_type"], doc["_id"])
+                source = self.get_from_sources(doc["_index"], doc["_id"])
                 if not source:
                     LOG.error(
                         "mGET: Document id: %s has not been found "
@@ -688,14 +685,12 @@ class BulkBuffer(object):
 
     def add_to_sources(self, action, doc_source):
         """Store sources locally"""
-        mapping = self.sources.setdefault(action["_index"], {}).setdefault(
-            action["_type"], {}
-        )
+        mapping = self.sources.setdefault(action["_index"], {})
         mapping[action["_id"]] = doc_source
 
-    def get_from_sources(self, index, doc_type, document_id):
+    def get_from_sources(self, index, document_id):
         """Get source stored locally"""
-        return self.sources.get(index, {}).get(doc_type, {}).get(document_id, {})
+        return self.sources.get(index, {}).get(document_id, {})
 
     def bulk_index(self, action, meta_action):
         self.action_buffer.append(action)
