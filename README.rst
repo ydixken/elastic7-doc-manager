@@ -16,9 +16,9 @@ Original Docs
 The mongo-connector project originated as a MongoDB mongo-labs
 project and is now community-maintained under the custody of YouGov, Plc.
 
-.. image:: https://travis-ci.org/yougov/elastic2-doc-manager.svg?branch=master
+.. image:: https://travis-ci.org/tmpaul06/elastic7-doc-manager.svg
    :alt: View build status
-   :target: https://travis-ci.org/yougov/elastic2-doc-manager
+   :target: https://travis-ci.org/tmpaul06/elastic7-doc-manager
 
 Getting Started
 ===============
