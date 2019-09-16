@@ -372,7 +372,6 @@ class TestElasticDocManager(ElasticsearchTestCase):
 
         self.elastic_doc.handle_command({"create": "test2"}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
-        self.assertIn("test2", self._mappings("test_test"))
 
         docs = [
             {"_id": 0, "name": "ted"},
@@ -388,7 +387,7 @@ class TestElasticDocManager(ElasticsearchTestCase):
 
         res = list(
             self.elastic_doc._stream_search(
-                index="test_test", body={"query": {"match_all": {}}}
+                index="test_test2", body={"query": {"match_all": {}}}
             )
         )
         for d in docs:
@@ -398,19 +397,16 @@ class TestElasticDocManager(ElasticsearchTestCase):
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
         res = list(
             self.elastic_doc._stream_search(
-                index="test_test", body={"query": {"match_all": {}}}
+                index="test_test2", body={"query": {"match_all": {}}}
             )
         )
         self.assertEqual(0, len(res))
 
         self.elastic_doc.handle_command({"create": "test2"}, *cmd_args)
-        self.elastic_doc.handle_command({"create": "test3"}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
         self.elastic_doc.handle_command({"dropDatabase": 1}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
-        self.assertNotIn("test", self._indices())
-        self.assertNotIn("test2", self._mappings())
-        self.assertNotIn("test3", self._mappings())
+        self.assertNotIn("test_test2", self._indices())
 
     def buffer_and_drop(self):
         """Insert document and drop collection while doc is in buffer"""

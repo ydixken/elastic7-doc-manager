@@ -275,8 +275,11 @@ class DocManager(DocManagerBase):
         if doc.get("create"):
             db, coll = self.command_helper.map_collection(db, doc["create"])
             if db and coll:
+                es_index = self._get_es_index(db, coll)
+                if not self.elastic.indices.exists(es_index):
+                    self.elastic.indices.create(es_index)
                 self.elastic.indices.put_mapping(
-                    index=self._get_es_index(db, coll),
+                    index=es_index,
                     body={"_source": {"enabled": True}}
                 )
 
