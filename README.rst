@@ -8,8 +8,7 @@ Read the following sections if you are interested in older versions of elasticse
 
 To see an example, check: https://github.com/tmpaul06/es7-mongo-example
 
-> Note: This project is not available via pypi. If you want to use the project, please point your requirements file or setup.py
-to this github repo.
+   >  Note: This project is not available via pypi. If you want to use the project, please point your requirements file or setup.py to this github repo.
 
 Original Docs
 ==============
