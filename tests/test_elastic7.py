@@ -149,7 +149,7 @@ class TestElastic(ElasticsearchTestCase):
         doc = self._search({
             "match_all": {}
         })
-        raise Exception(doc)
+        raise Exception(list(doc))
         query = {"match": {"_all": "test_insert_file"}}
         res = list(self._search(query))
         self.assertEqual(len(res), 1)
