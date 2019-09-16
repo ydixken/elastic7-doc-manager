@@ -405,8 +405,17 @@ class DocManager(DocManagerBase):
 
         # make sure that elasticsearch treats it like a file
         if not self.has_attachment_mapping:
-            body = {"properties": {self.attachment_field: {"type": "attachment"}}}
-            self.elastic.indices.put_mapping(index=index, body=body)
+            body = {
+                "description": "Extract attachment information",
+                "processors": [
+                    {
+                        "attachment": {
+                            "field": self.attachment_field
+                        }
+                    }
+                ]
+            }
+            self.elastic.ingest.put_pipeline(id='attachment', body=body)
             self.has_attachment_mapping = True
 
         metadata = {"ns": namespace, "_ts": timestamp}
