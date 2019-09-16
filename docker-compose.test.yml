@@ -3,8 +3,8 @@ version: "2"
 services:
   es:
     build:
-      - context: ./support/es
-      - dockerfile: TestDockerfile
+      context: ./support/es
+      dockerfile: TestDockerfile
     ports:
        - "9200:9200"
     ulimits:
