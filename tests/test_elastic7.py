@@ -41,11 +41,13 @@ class ElasticsearchTestCase(unittest.TestCase):
     def setUp(self):
         # Create target index in elasticsearch
         self.elastic_conn.indices.create(index="test_test", ignore=400)
+        self.elastic_conn.indices.create(index="test_test2", ignore=400)
         self.elastic_conn.cluster.health(wait_for_status="yellow", index="test_test")
         self.elastic_doc = DocManager(elastic_pair, auto_commit_interval=0)
 
     def tearDown(self):
         self.elastic_conn.indices.delete(index="test_test", ignore=404)
+        self.elastic_conn.indices.delete(index="test_test2", ignore=404)
         self.elastic_doc.stop()
 
     def _search(self, query=None):
