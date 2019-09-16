@@ -427,10 +427,12 @@ class DocManager(DocManagerBase):
             "_op_type": "index",
             "_index": index,
             "_id": doc_id,
+            "pipeline": "attachment",
             "_source": doc,
         }
         meta_action = {
             "_op_type": "index",
+            "pipeline": "attachment",
             "_index": self.meta_index_name,
             "_id": doc_id,
             "_source": bson.json_util.dumps(metadata),

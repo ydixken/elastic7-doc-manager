@@ -395,12 +395,7 @@ class TestElasticDocManager(ElasticsearchTestCase):
 
         self.elastic_doc.handle_command({"drop": "test2"}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
-        res = list(
-            self.elastic_doc._stream_search(
-                index="test_test2", body={"query": {"match_all": {}}}
-            )
-        )
-        self.assertEqual(0, len(res))
+        assert not self.elastic_conn.indices.exists("test_test2")
 
         self.elastic_doc.handle_command({"create": "test2"}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
