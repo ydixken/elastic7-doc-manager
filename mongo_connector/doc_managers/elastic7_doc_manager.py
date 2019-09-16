@@ -338,7 +338,6 @@ class DocManager(DocManagerBase):
         meta_action = {
             "_op_type": "index",
             "_index": self.meta_index_name,
-            "_type": self.meta_type,
             "_id": doc_id,
             "_source": bson.json_util.dumps(metadata),
         }
@@ -424,7 +423,6 @@ class DocManager(DocManagerBase):
         meta_action = {
             "_op_type": "index",
             "_index": self.meta_index_name,
-            "_type": self.meta_type,
             "_id": doc_id,
             "_source": bson.json_util.dumps(metadata),
         }
@@ -445,7 +443,6 @@ class DocManager(DocManagerBase):
         meta_action = {
             "_op_type": "delete",
             "_index": self.meta_index_name,
-            "_type": self.meta_type,
             "_id": str(document_id),
         }
 
