@@ -1,3 +1,3 @@
 FROM elasticsearch:7.3.0
 
-RUN /usr/share/elasticsearch/bin/plugin install --batch mapper-attachments
+RUN echo 'y' | /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-attachment 
