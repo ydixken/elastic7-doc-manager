@@ -146,11 +146,7 @@ class TestElastic(ElasticsearchTestCase):
         id = fs.put(test_data, filename="test.txt", encoding="utf8")
         assert_soon(lambda: self._count() > 0)
 
-        doc = self._search({
-            "match_all": {}
-        })
-        raise Exception(list(doc))
-        query = {"match": {"_all": "test_insert_file"}}
+        query = {"match": {"attachment.content": "test_insert_file"}}
         res = list(self._search(query))
         self.assertEqual(len(res), 1)
         doc = res[0]
