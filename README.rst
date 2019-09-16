@@ -1,6 +1,8 @@
 ====================
-elastic2-doc-manager
+elastic7-doc-manager
 ====================
+
+Forked from original elastic2-doc-manager
 
 The mongo-connector project originated as a MongoDB mongo-labs
 project and is now community-maintained under the custody of YouGov, Plc.

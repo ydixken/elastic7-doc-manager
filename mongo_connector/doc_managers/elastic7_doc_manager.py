@@ -29,12 +29,8 @@ try:
     __import__("elasticsearch")
 except ImportError:
     raise ImportError(
-        "Error: elasticsearch (https://pypi.python.org/pypi/elasticsearch) "
-        "version 2.x or 5.x is not installed.\n"
-        "Install with:\n"
-        "  pip install elastic2-doc-manager[elastic2]\n"
-        "or:\n"
-        "  pip install elastic2-doc-manager[elastic5]\n"
+        "Error: elasticsearch 7.x is not installed.\n"
+        "  pip install elastic7-doc-manager[elastic7]\n"
     )
 
 from elasticsearch import (
@@ -171,6 +167,14 @@ class DocManager(DocManagerBase):
 
     Receives documents from an OplogThread and takes the appropriate actions on
     Elasticsearch.
+
+    Going forward, ES will stop using doc_types. The classic mapping from mongodb
+    database > ES index will now fail because an index is now a collection of docs
+    with single doc_type.
+
+    In elastic7-doc-manager, we will now instead specify the db as an attribute
+    on the index which is mapped to a MongoDB collection
+
     """
 
     def __init__(
@@ -190,7 +194,7 @@ class DocManager(DocManagerBase):
                 raise errors.InvalidConfiguration(
                     "aws extras must be installed to sign Elasticsearch "
                     "requests. Install with: "
-                    "pip install elastic2-doc-manager[aws]"
+                    "pip install elastic7-doc-manager[aws]"
                 )
             client_options["http_auth"] = create_aws_auth(kwargs["aws"])
             client_options["use_ssl"] = True
@@ -225,8 +229,15 @@ class DocManager(DocManagerBase):
 
     def _index_and_mapping(self, namespace):
         """Helper method for getting the index and type from a namespace."""
-        index, doc_type = namespace.split(".", 1)
-        return index.lower(), doc_type
+        # Namespace is usually of the form db.collection
+        db, collection = namespace.split(".", 1)
+        return '{}_{}'.format(
+            db.lower(),
+            collection.lower()
+        ), '_doc'
+
+    def _get_es_index(self, db, coll):
+        return '{}_{}'.format(db.lower(), coll.lower())
 
     def stop(self):
         """Stop the auto-commit thread."""
@@ -249,18 +260,25 @@ class DocManager(DocManagerBase):
         if doc.get("dropDatabase"):
             dbs = self.command_helper.map_db(db)
             for _db in dbs:
-                self.elastic.indices.delete(index=_db.lower())
+                self.elastic.indices.delete(
+                    self._get_es_index(db, '*')
+                )
 
         if doc.get("renameCollection"):
+            # Renaming a collection can be supported via aliases. For now,
+            # ignore because we need to evaluate how namespace remapping
+            # will affect this.
             raise errors.OperationFailed(
-                "elastic_doc_manager does not support renaming a mapping."
+                'Cannot support renaming a collection'
             )
 
         if doc.get("create"):
             db, coll = self.command_helper.map_collection(db, doc["create"])
             if db and coll:
                 self.elastic.indices.put_mapping(
-                    index=db.lower(), doc_type=coll, body={"_source": {"enabled": True}}
+                    index=self._get_es_index(db, coll),
+                    doc_type='_doc',
+                    body={"_source": {"enabled": True}}
                 )
 
         if doc.get("drop"):
@@ -268,26 +286,13 @@ class DocManager(DocManagerBase):
             if db and coll:
                 # This will delete the items in coll, but not get rid of the
                 # mapping.
+                es_index = self._get_es_index(db, coll)
                 warnings.warn(
-                    "Deleting all documents of type %s on index %s."
+                    "Deleting all documents of on index %s."
                     "The mapping definition will persist and must be"
-                    "removed manually." % (coll, db)
+                    "removed manually." % (es_index)
                 )
-                responses = streaming_bulk(
-                    self.elastic,
-                    (
-                        dict(result, _op_type="delete")
-                        for result in scan(
-                            self.elastic, index=db.lower(), doc_type=coll
-                        )
-                    ),
-                )
-                for ok, resp in responses:
-                    if not ok:
-                        LOG.error(
-                            "Error occurred while deleting ElasticSearch docum"
-                            "ent during handling of 'drop' command: %r" % resp
-                        )
+                self.elastic.indices.delete(es_index, ignore=[404])
 
     @wrap_exceptions
     def update(self, document_id, update_spec, namespace, timestamp):
