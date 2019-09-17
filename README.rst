@@ -2,23 +2,46 @@
 elastic7-doc-manager
 ====================
 
-Forked from original elastic2-doc-manager to support ES 7.x
+.. image:: https://travis-ci.org/tmpaul06/elastic7-doc-manager.svg
+   :alt: View build status
+   :target: https://travis-ci.org/tmpaul06/elastic7-doc-manager
 
-Read the following sections if you are interested in older versions of elasticsearch.
+Forked from original `elastic2-doc-manager <https://github.com/yougov/elastic2-doc-manager>`_ to support ES 7.x.
 
 To see an example, check: https://github.com/tmpaul06/es7-mongo-example
 
    >  Note: This project is not available via pypi. If you want to use the project, please point your requirements file or setup.py to this github repo.
+   
+   
+Changelog
+~~~~~~~~~
+The following are the changes/differences between ``elastic7-doc-manager`` and ``elastic2-doc-manager``.
+
+1. MongoDB database + MongoDB collection is mapped to a single Elasticsearch index with the convention: ``{db}_{collection}`` where ``db`` and ``collection`` are the lowercase names of the MongoDB database and MongoDB collection.
+2. No more ``doc_type`` for ES indices.
+3. Removed ``mapper-attachment`` plugin which was responsible for parsing file attachments, and replaced it with newer ``ingest-attachment`` plugin.
+
+Refer to the es7-mongo-example link given in the first section for more details.
+
+Rationale
+=========
+ES 7.x is deprecating ``doc_type`` going forward, hence this library takes a slightly different route compared to the previous ``elastic2-doc-manager``.
+
+Previously, MongoDB databases were mapped to ES indices, and MongoDB collections were mapped to ES doc types. But this causes problems with the underlying Lucene backend. An index in ES is not a database, but it is more like a table, and therefore it makes sense to store a collection of documents of similar type in an ES index.
+
+For more info, https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html
+
+Since ES has no notion of a "database", we namespace the ES index according to MongoDB db & collection.
+
+For e.g ``foobar`` database in MongoDB and ``test_me`` collection in MongoDb will map to ``foobar_test_me`` ES index. The naming convention is fixed for now, may become flexible in the future to support other use cases.
+
+Since mongo-connector uses a namespace mapping to create a many to many relationship betweeen MongoDB and ES, please go through the test cases to confirm that it works for you.
 
 Original Docs
 ==============
 
 The mongo-connector project originated as a MongoDB mongo-labs
 project and is now community-maintained under the custody of YouGov, Plc.
-
-.. image:: https://travis-ci.org/tmpaul06/elastic7-doc-manager.svg
-   :alt: View build status
-   :target: https://travis-ci.org/tmpaul06/elastic7-doc-manager
 
 Getting Started
 ===============
@@ -60,6 +83,12 @@ For use with an Elasticsearch 5.x server, install with::
   pip install 'elastic2-doc-manager[elastic5]'
 
 .. note:: Version 0.3.0 added support for Elasticsearch 5.x.
+
+Elasticsearch 7.x
+-----------------
+For use with Elasticsearch 7.x, install this repo with::
+
+   pip install git+https://github.com/tmpaul06/elastic7-doc-manager.git
 
 
 Amazon Elasticsearch Service
