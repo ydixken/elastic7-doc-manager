@@ -278,6 +278,7 @@ class DocManager(DocManagerBase):
                 es_index = self._get_es_index(db, coll)
                 if not self.elastic.indices.exists(es_index):
                     self.elastic.indices.create(es_index)
+                    self.elastic.indices.refresh()
                 self.elastic.indices.put_mapping(
                     index=es_index,
                     body={"_source": {"enabled": True}}
