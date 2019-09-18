@@ -45,7 +45,8 @@ class ElasticsearchTestCase(unittest.TestCase):
         But when os variable ELASTIC7_DOC_MANAGER_ES_INDEX_NAME_TEMPLATE is set,
         we will use that template
         """
-        return self.elastic_doc._index_and_mapping('.'.join(default_index.split('_')))
+        index, _ = self.elastic_doc._index_and_mapping('.'.join(default_index.split('_')))
+        return index
 
     def setUp(self):
         # Create target index in elasticsearch
