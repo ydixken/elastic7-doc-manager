@@ -8,9 +8,18 @@ before_install:
   - docker-compose -f docker-compose.test.yml up -d
   - sleep 10
 
+env:
+  - ELASTIC7_DOC_MANAGER_ES_INDEX_NAME_TEMPLATE='{db}.{collection}'
+  # This is a fake value that is ignored by the doc manager. I don't know how to
+  # run a matrix build with env variable 'unset'
+  - ELASTIC7_DOC_MANAGER_ES_INDEX_NAME_TEMPLATE='None'
+
 jobs:
   fast_finish: true
   include:
+  # test with custom es index name template
+  - python: &latest_py3 3.6
+    env: MONGODB=3.2.11 TOXENV=elastic7
   - python: &latest_py3 3.6
     env: MONGODB=3.2.11 TOXENV=elastic7
   - python: 3.4

@@ -45,12 +45,12 @@ def disable_auto_refresh(func):
     def _disable_auto_refresh(self, *args, **kwargs):
         try:
             self.elastic_conn.indices.put_settings(
-                index="test_test", body={"index": {"refresh_interval": "-1"}}
+                index=self.wrap_index("test_test"), body={"index": {"refresh_interval": "-1"}}
             )
             return func(self, *args, **kwargs)
         finally:
             self.elastic_conn.indices.put_settings(
-                index="test_test", body={"index": {"refresh_interval": "1s"}}
+                index=self.wrap_index("test_test"), body={"index": {"refresh_interval": "1s"}}
             )
 
     return _disable_auto_refresh
@@ -98,7 +98,7 @@ class TestElasticDocManager(ElasticsearchTestCase):
         docc = {"_id": "1", "name": "John"}
         self.elastic_doc.upsert(docc, *TESTARGS)
         res = self.elastic_conn.search(
-            index="test_test", body={"query": {"match_all": {}}}
+            index=self.wrap_index("test_test"), body={"query": {"match_all": {}}}
         )["hits"]["hits"]
         for doc in res:
             self.assertEqual(doc["_id"], "1")
@@ -157,7 +157,7 @@ class TestElasticDocManager(ElasticsearchTestCase):
         self.elastic_doc.update(doc_id, update_spec, *TESTARGS)
 
         res = self.elastic_conn.search(
-            index="test_test", body={"query": {"match_all": {}}}
+            index=self.wrap_index("test_test"), body={"query": {"match_all": {}}}
         )["hits"]["hits"]
 
         for doc in res:
@@ -193,14 +193,14 @@ class TestElasticDocManager(ElasticsearchTestCase):
         docc = {"_id": "1", "name": "John"}
         self.elastic_doc.upsert(docc, *TESTARGS)
         res = self.elastic_conn.search(
-            index="test_test", body={"query": {"match_all": {}}}
+            index=self.wrap_index("test_test"), body={"query": {"match_all": {}}}
         )["hits"]["hits"]
         res = [x["_source"] for x in res]
         self.assertEqual(len(res), 1)
 
         self.elastic_doc.remove(docc["_id"], *TESTARGS)
         res = self.elastic_conn.search(
-            index="test_test", body={"query": {"match_all": {}}}
+            index=self.wrap_index("test_test"), body={"query": {"match_all": {}}}
         )["hits"]["hits"]
         res = [x["_source"] for x in res]
         self.assertEqual(len(res), 0)
@@ -356,7 +356,7 @@ class TestElasticDocManager(ElasticsearchTestCase):
         docc = {"_id": "6", "name": "Mr T."}
         self.elastic_doc.upsert(docc, "test.test", ts + 1)
 
-        self.assertEqual(self.elastic_doc.elastic.count(index="test_test")["count"], 3)
+        self.assertEqual(self.elastic_doc.elastic.count(index=self.wrap_index("test_test"))["count"], 3)
         doc = self.elastic_doc.get_last_doc()
         self.assertEqual(doc["_id"], "4")
 
@@ -364,7 +364,7 @@ class TestElasticDocManager(ElasticsearchTestCase):
         self.elastic_doc.upsert(docc, "test.test", ts + 4)
         doc = self.elastic_doc.get_last_doc()
         self.assertEqual(doc["_id"], "6")
-        self.assertEqual(self.elastic_doc.elastic.count(index="test_test")["count"], 3)
+        self.assertEqual(self.elastic_doc.elastic.count(index=self.wrap_index("test_test"))["count"], 3)
 
     def test_commands(self):
         cmd_args = ("test.$cmd", 1)
@@ -387,7 +387,7 @@ class TestElasticDocManager(ElasticsearchTestCase):
 
         res = list(
             self.elastic_doc._stream_search(
-                index="test_test2", body={"query": {"match_all": {}}}
+                index=self.wrap_index("test_test2"), body={"query": {"match_all": {}}}
             )
         )
         for d in docs:
@@ -395,13 +395,13 @@ class TestElasticDocManager(ElasticsearchTestCase):
 
         self.elastic_doc.handle_command({"drop": "test2"}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
-        assert not self.elastic_conn.indices.exists("test_test2")
+        assert not self.elastic_conn.indices.exists(self.wrap_index("test_test2"))
 
         self.elastic_doc.handle_command({"create": "test2"}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
         self.elastic_doc.handle_command({"dropDatabase": 1}, *cmd_args)
         retry_until_ok(self.elastic_conn.indices.refresh, index="")
-        self.assertNotIn("test_test2", self._indices())
+        self.assertNotIn(self.wrap_index("test_test2"), self._indices())
 
     def buffer_and_drop(self):
         """Insert document and drop collection while doc is in buffer"""
