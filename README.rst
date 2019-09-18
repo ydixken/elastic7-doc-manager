@@ -17,7 +17,14 @@ Changelog
 ~~~~~~~~~
 The following are the changes/differences between ``elastic7-doc-manager`` and ``elastic2-doc-manager``.
 
-1. MongoDB database + MongoDB collection is mapped to a single Elasticsearch index with the convention: ``{db}_{collection}`` where ``db`` and ``collection`` are the lowercase names of the MongoDB database and MongoDB collection.
+1. MongoDB database + MongoDB collection is mapped to a single Elasticsearch index with the convention: ``{db}_{collection}`` where ``db`` and ``collection`` are the lowercase names of the MongoDB database and MongoDB collection. To change
+the format, specify it using an environment variable ``ELASTIC7_DOC_MANAGER_ES_INDEX_NAME_TEMPLATE``.
+
+```
+ELASTIC7_DOC_MANAGER_ES_INDEX_NAME_TEMPLATE='{db}.{collection}'
+```
+If the format is invalid, it will be ignored
+
 2. No more ``doc_type`` for ES indices.
 3. Removed ``mapper-attachment`` plugin which was responsible for parsing file attachments, and replaced it with newer ``ingest-attachment`` plugin.
 
