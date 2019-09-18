@@ -21,6 +21,7 @@ import base64
 import logging
 import threading
 import time
+import os
 import warnings
 
 import bson.json_util
@@ -71,6 +72,8 @@ DEFAULT_SEND_INTERVAL = 5
 """The default interval in seconds to send buffered operations."""
 
 DEFAULT_AWS_REGION = "us-east-1"
+
+DEFAULT_ES_INDEX_NAME_TEMPLATE = "{db}_{collection}"
 
 __version__ = importlib_metadata.version("elastic7_doc_manager")
 
@@ -186,6 +189,10 @@ class DocManager(DocManagerBase):
         meta_index_name="mongodb_meta",
         meta_type="mongodb_meta",
         attachment_field="content",
+        es_name_template=os.getenv(
+            'ELASTIC7_DOC_MANAGER_ES_INDEX_NAME_TEMPLATE',
+            DEFAULT_ES_INDEX_NAME_TEMPLATE
+        ),
         **kwargs
     ):
         client_options = kwargs.get("clientOptions", {})
@@ -205,6 +212,9 @@ class DocManager(DocManagerBase):
         self.elastic = Elasticsearch(hosts=url, **client_options)
 
         self._formatter = DefaultDocumentFormatter()
+        self.es_name_template = es_name_template \
+            if self._is_es_name_template_valid(es_name_template) else \
+            DEFAULT_ES_INDEX_NAME_TEMPLATE
         self.BulkBuffer = BulkBuffer(self)
 
         # As bulk operation can be done in another thread
@@ -227,13 +237,22 @@ class DocManager(DocManagerBase):
         )
         self.auto_commiter.start()
 
+    def _is_es_name_template_valid(self, tpl):
+        if not tpl:
+            return False
+        if '{db}' not in tpl:
+            return False
+        if '{collection}' not in tpl:
+            return False
+        return True
+
     def _index_and_mapping(self, namespace):
         """Helper method for getting the index and type from a namespace."""
         # Namespace is usually of the form db.collection
         db, collection = namespace.split(".", 1)
-        return '{}_{}'.format(
-            db.lower(),
-            collection.lower()
+        return self.es_name_template.format(
+            db=db.lower() if db is not None else '',
+            collection=collection.lower() if collection is not None else ''
         ), '_doc'
 
     def _get_es_index(self, db, coll):

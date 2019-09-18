@@ -38,30 +38,40 @@ class ElasticsearchTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.elastic_conn = Elasticsearch(hosts=[elastic_pair])
 
+    def wrap_index(self, default_index):
+        """The tests will use default index separator `_` when ENV variable is not set for
+        index separator.
+
+        But when os variable ELASTIC7_DOC_MANAGER_ES_INDEX_NAME_TEMPLATE is set,
+        we will use that template
+        """
+        index, _ = self.elastic_doc._index_and_mapping('.'.join(default_index.split('_')))
+        return index
+
     def setUp(self):
         # Create target index in elasticsearch
-        self.elastic_conn.indices.create(index="test_test", ignore=400)
-        self.elastic_conn.indices.create(index="test_test2", ignore=400)
-        self.elastic_conn.cluster.health(wait_for_status="yellow", index="test_test")
         self.elastic_doc = DocManager(elastic_pair, auto_commit_interval=0)
+        self.elastic_conn.indices.create(index=self.wrap_index("test_test"), ignore=400)
+        self.elastic_conn.indices.create(index=self.wrap_index("test_test2"), ignore=400)
+        self.elastic_conn.cluster.health(wait_for_status="yellow", index=self.wrap_index("test_test"))
 
     def tearDown(self):
-        self.elastic_conn.indices.delete(index="test_test", ignore=404)
-        self.elastic_conn.indices.delete(index="test_test2", ignore=404)
+        self.elastic_conn.indices.delete(index=self.wrap_index("test_test"), ignore=404)
+        self.elastic_conn.indices.delete(index=self.wrap_index("test_test2"), ignore=404)
         self.elastic_doc.stop()
 
     def _search(self, query=None):
         query = query or {"match_all": {}}
         return self.elastic_doc._stream_search(
-            index="test_test", body={"query": query}
+            index=self.wrap_index("test_test"), body={"query": query}
         )
 
     def _count(self):
-        return self.elastic_conn.count(index="test_test")["count"]
+        return self.elastic_conn.count(index=self.wrap_index("test_test"))["count"]
 
     def _remove(self):
         bulk_deletes = []
-        for result in scan(self.elastic_conn, index="test_test"):
+        for result in scan(self.elastic_conn, index=self.wrap_index("test_test")):
             result["_op_type"] = "delete"
             bulk_deletes.append(result)
         bulk(self.elastic_conn, bulk_deletes)
