@@ -95,7 +95,7 @@ Elasticsearch 7.x
 -----------------
 For use with Elasticsearch 7.x, install this repo with::
 
-   pip install git+https://github.com/tmpaul06/elastic7-doc-manager.git
+   pip install git+https://github.com/ydixken/elastic7-doc-manager.git
 
 
 Amazon Elasticsearch Service
